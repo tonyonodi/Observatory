@@ -2,9 +2,9 @@
   "name": "tsgen",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "ts-node src/app.ts",
+    "start": "ts-node src/index.ts",
     "build": "tsc",
     "watch": "nodemon",
     "test": "jest"
