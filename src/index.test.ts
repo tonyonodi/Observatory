@@ -1,7 +1,7 @@
 import { Optic } from "./index";
 
 // Messing about
-import { Lens, fromTraversable, Traversal } from "monocle-ts";
+import { Lens, fromTraversable } from "monocle-ts";
 import { array } from "fp-ts/lib/Array";
 import * as L from "monocle-ts/lib/Lens";
 import * as T from "monocle-ts/lib/Traversal";
@@ -18,7 +18,7 @@ type Person = {
   first_name: string;
   surname: string;
   address: Address;
-  pets: string[];
+  tweets: Tweet[];
 };
 
 const person: Person = {
@@ -29,61 +29,127 @@ const person: Person = {
     street: "Glentrammon Road",
     city: "London",
   },
-  pets: ["Fido", "Mittens"],
+  tweets: [
+    { text: "blah", id: 1 },
+    { text: "blah 2", id: 2 },
+  ],
 };
 
+type Tweet = {
+  text: string;
+  id: number;
+};
+
+const _Person = Optic<Person>();
+const _Tweet = Optic<Tweet>();
+
 // More messsing about
-const p = L.id<Person>();
-const ad = L.prop<Person, "address">("address");
-const pt = L.prop<Person, "pets">("pets");
-const st = L.prop<Address, "street">("street");
+// const p = L.id<Person>();
+// const ad = L.prop<Person, "address">("address");
+// const pt = L.prop<Person, "tweets">("tweets");
+// const st = L.prop<Address, "street">("street");
+// const _fn: L.Lens<Person, string> = Lens.fromProp<Person>()("first_name");
 
-st(ad(p)).get(person);
+// // var fromLens = function (lens) { return new Lens(lens.get, lens.set); };
+// const l = new Lens(p.get, p.set);
 
-const arrayTraversal = T.fromTraversable(array)<string>();
-// const piped = pipe(
-//   // blah
-//   p,
-//   pets,
-//   t
-// );
+// st(ad(p)).get(person);
 
-// const x = pipe(p, ad, st);
+// const arrayTraversal = fromTraversable(array)<string>();
 
-const capitalise = (s: string) => s.toUpperCase();
+// Optic<Person>().tweets.__each;
 
-const pets = Lens.fromProp<Person>()("pets");
+// const capitalise = (s: string) => s.toUpperCase();
 
-// var fromTraversal = function (traversal) { return new Traversal(traversal.modifyF); };
-// Lens.prototype.composeTraversal = function (ab) {
-//   return fromTraversal(pipeable_1.pipe(this, lens.asTraversal, traversal.compose(ab)));
-// };
-// const test = ad.compose(Lens.fromProp<Address>()("street"));
+// const pets = Lens.fromProp<Person>()("tweets");
 
-const personToPets = new Traversal(
-  pipe(pets, pets.asTraversal, T.compose(arrayTraversal)).modifyF
-);
+// it("quick test", () => {
+//   const optic = l
+//     .composeLens(Lens.fromProp<Person>()("tweets"))
+//     .composeTraversal(fromTraversable(array)<Tweet>())
+//     .composeLens(Lens.fromProp<Tweet>()("text"));
 
-// pipe(personToPets, L.id<string>());
+//   expect(optic.asFold().getAll(person)).toEqual(["blah", "blah 2"]);
+// });
 
-// const capitalised = personToPets.modify(capitalise)(person);
+// const trav = fromTraversable(array)<Person>();
+// const mytrav = T.id<string>();
 
-// console.log(capitalised);
-
-const trav = fromTraversable(array)<Person>();
-
-const blah = trav
-  .composeLens(Lens.fromProp<Person>()("first_name"))
-  .set("blah")([person]);
-
-// Optic<Person[]>().__each().first_name.__setWith(capitalise)
+// const blah = trav
+//   .composeLens(Lens.fromProp<Person>()("first_name"))
+//   .set("blah")([person]);
 
 it("should be able to get a prop value", () => {
   expect(Optic<Person>().first_name.__getFrom(person)).toEqual("Tony");
 });
 
+it("should be able to get an array from a value", () => {
+  expect(Optic<Person>().tweets.__getFrom(person)).toEqual(person.tweets);
+});
+
 it("should be able to get a nested value", () => {
   expect(Optic<Person>().address.number.__getFrom(person)).toEqual(1);
+});
+
+it("should be able to get props from an array", () => {
+  expect(Optic<Person>().tweets.__each.text.__getFrom(person)).toEqual([
+    "blah",
+    "blah 2",
+  ]);
+});
+
+const capitalise = (s: string) => s.toUpperCase();
+
+const updateFirstTweet = (t: Tweet) =>
+  t.id === 1 ? { ...t, text: "updated" } : t;
+
+const _l = L.id<Person>();
+const l = new Lens(_l.get, _l.set);
+const updatedPerson = l
+  .composeLens(Lens.fromProp<Person>()("tweets"))
+  .composeTraversal(fromTraversable(array)<Tweet>())
+  .filter((t) => t.id === 1);
+
+// _Person.tweets.__filter((t) => t.id === 1).text.__getFrom(person);
+
+// it("quick", () => {
+//   expect(updatedPerson).toEqual({
+//     ...person,
+//     tweets: [
+//       { text: "updated", id: 1 },
+//       { text: "blah 2", id: 2 },
+//     ],
+//   });
+// });
+
+it("should be able to modify values in an array", () => {
+  expect(
+    Optic<Person>().tweets.__each.__setWith(updateFirstTweet)(person)
+  ).toEqual({
+    ...person,
+    tweets: [
+      { text: "updated", id: 1 },
+      { text: "blah 2", id: 2 },
+    ],
+  });
+});
+
+it("should be able to filter an array and get a value from it", () => {
+  expect(
+    _Person.tweets.__filter((t) => t.id === 1).text.__getFrom(person)
+  ).toEqual(["blah"]);
+});
+
+it("should be able to filter an array and modify a value", () => {
+  expect(
+    _Person.tweets.__filter((t) => t.id === 1).text.__setTo("updated")(person)
+  ).toEqual({
+    ...person,
+    tweets: [
+      { text: "updated", id: 1 },
+      { text: "blah 2", id: 2 },
+    ],
+  });
 });
 
 it("should be able to set a nested value", () => {
@@ -95,6 +161,6 @@ it("should be able to set a nested value", () => {
       street: "Glentrammon Road",
       city: "London",
     },
-    pets: ["Fido", "Mittens"],
+    tweets: person.tweets,
   });
 });
