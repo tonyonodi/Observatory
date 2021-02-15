@@ -25,8 +25,8 @@ type Tweet = {
 const person: Person = {
   username: "Tony",
   tweets: [
-    { text: "Bitcoin is a good investment actually", id: 1 },
-    { text: "Something else bad", id: 2 },
+    { text: "bitcoin is a good investment actually", id: 1 },
+    { text: "something else bad", id: 2 },
   ],
 };
 ```
@@ -43,7 +43,7 @@ const censorTweet = (person: Person, tweetId: number, newText: string)  => {
   }
 }
 
-const newTweet = censorTweet(person, 1, "Throw your money in the sea");
+const newTweet = censorTweet(person, 1, "throw your money in the sea");
 ```
 
 While this code successfully improves the standard of financial advice on our toy social media site it's arguably a bit unweildy. Optics libraries like `monocle-ts` are meant to make this sort of thing a bit more concise, or at least more composable:
@@ -60,7 +60,7 @@ const censorTweet = (person: Person, tweetId: number, newText: string)  =>
     .modify(() => newText)(person)
 
 
-const newTweet = censorTweet(person, 1, "Throw your money in the sea");
+const newTweet = censorTweet(person, 1, "throw your money in the sea");
 ```
 
 Optics are very powerful and composable, but at worst this can be less concise, and less readable; and at best it can be confusing to know what to put where.
@@ -76,7 +76,7 @@ const censorTweet = (person: Person, tweetId: number, newText: string)  =>
     .tweets.__filter(t => t.id === tweetId)
     .text.__setTo(newText)(person)
 
-const newTweet = censorTweet(person, 1, "Throw your money in the sea");
+const newTweet = censorTweet(person, 1, "throw your money in the sea");
 ```
 
 Better still you can lazily tab your way through this function with code completion as demonstrated by the gif below:
