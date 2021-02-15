@@ -79,6 +79,6 @@ const censorTweet = (person: Person, tweetId: number, newText: string)  =>
 const newTweet = censorTweet(person, 1, "throw your money in the sea");
 ```
 
-Better still you can lazily tab your way through this function with code completion as demonstrated by the gif below:
+Better still, once `Optic` knows the type of the object you're modifying you're pretty much off to the races. You Can lazily tab your way through your censorship function logic with code completion, as demonstrated by the gif below:
 
 [GIF below]
