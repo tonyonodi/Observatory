@@ -68,11 +68,11 @@ Optics are very powerful and composable, but at worst this can be less concise, 
 With proxy violence and liberal use of `any` under the bonnet I've slapped a layer on top of all of this in an attempt to make our censorship function more friendly to read and write:
 
 ```TypeScript
-import { Optic } from "observatory";
+import { Access } from "observatory";
 
 
 const censorTweet = (person: Person, tweetId: number, newText: string)  =>
-  Optic<Person>()
+  Access<Person>()
     .tweets.__filter(t => t.id === tweetId)
     .text.__setTo(newText)(person)
 
