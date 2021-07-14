@@ -42,7 +42,7 @@ interface OpticProxyConstructor<Source extends Object, Dest extends Object> {
 
 const arrayTraversal = T.fromTraversable(array)<string>();
 
-export const Optic = <T extends object>() => {
+export const Access = <T extends object>() => {
   const OpticProxy = Proxy as OpticProxyConstructor<T, T>;
 
   return new OpticProxy({}, {

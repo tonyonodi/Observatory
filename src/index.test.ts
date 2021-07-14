@@ -1,4 +1,4 @@
-import { Optic } from "./index";
+import { Access } from "./index";
 
 // Messing about
 import { Lens, fromTraversable } from "monocle-ts";
@@ -40,8 +40,8 @@ type Tweet = {
   id: number;
 };
 
-const _Person = Optic<Person>();
-const _Tweet = Optic<Tweet>();
+const _Person = Access<Person>();
+const _Tweet = Access<Tweet>();
 
 // More messsing about
 // const p = L.id<Person>();
@@ -80,19 +80,19 @@ const _Tweet = Optic<Tweet>();
 //   .set("blah")([person]);
 
 it("should be able to get a prop value", () => {
-  expect(Optic<Person>().first_name.__getFrom(person)).toEqual("Tony");
+  expect(Access<Person>().first_name.__getFrom(person)).toEqual("Tony");
 });
 
 it("should be able to get an array from a value", () => {
-  expect(Optic<Person>().tweets.__getFrom(person)).toEqual(person.tweets);
+  expect(Access<Person>().tweets.__getFrom(person)).toEqual(person.tweets);
 });
 
 it("should be able to get a nested value", () => {
-  expect(Optic<Person>().address.number.__getFrom(person)).toEqual(1);
+  expect(Access<Person>().address.number.__getFrom(person)).toEqual(1);
 });
 
 it("should be able to get props from an array", () => {
-  expect(Optic<Person>().tweets.__each.text.__getFrom(person)).toEqual([
+  expect(Access<Person>().tweets.__each.text.__getFrom(person)).toEqual([
     "blah",
     "blah 2",
   ]);
@@ -124,7 +124,7 @@ const updatedPerson = l
 
 it("should be able to modify values in an array", () => {
   expect(
-    Optic<Person>().tweets.__each.__setWith(updateFirstTweet)(person)
+    Access<Person>().tweets.__each.__setWith(updateFirstTweet)(person)
   ).toEqual({
     ...person,
     tweets: [
@@ -153,7 +153,7 @@ it("should be able to filter an array and modify a value", () => {
 });
 
 it("should be able to set a nested value", () => {
-  expect(Optic<Person>().address.number.__setTo(11)(person)).toEqual({
+  expect(Access<Person>().address.number.__setTo(11)(person)).toEqual({
     first_name: "Tony",
     surname: "Onodi",
     address: {
